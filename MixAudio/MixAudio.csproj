@@ -40,6 +40,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Contracts\IConfigurable.cs" />
+    <Compile Include="Contracts\IFilter.cs" />
+    <Compile Include="Contracts\IFormat.cs" />
+    <Compile Include="Contracts\IInputFilter.cs" />
+    <Compile Include="Contracts\IOutputFilter.cs" />
+    <Compile Include="Contracts\IPipeline.cs" />
+    <Compile Include="Contracts\IPlayer.cs" />
+    <Compile Include="Contracts\ISample.cs" />
+    <Compile Include="Contracts\PlaybackState.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
