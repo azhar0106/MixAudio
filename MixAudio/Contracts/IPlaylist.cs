@@ -8,6 +8,7 @@ namespace MixAudio
 {
     public interface IPlaylist : IPlayer
     {
+        event Action StateChanged;
         int CurrentMediaIndex { get; set; }
         void Next();
         void Previous();

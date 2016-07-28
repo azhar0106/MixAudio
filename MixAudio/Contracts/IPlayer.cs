@@ -9,6 +9,7 @@ namespace MixAudio
     public interface IPlayer
     {
         PlaybackState State { get; }
+        event Action StateChanged;
         void Play();
         void Pause();
         void Stop();

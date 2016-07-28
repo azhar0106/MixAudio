@@ -19,22 +19,23 @@ namespace MixAudio
         public string CurrentMedia
         {
             get { return m_playlist.CurrentMedia; }
+
             //set
             //{
-                //if (value == m_currentMedia)
-                //{
-                //    return;
-                //}
-                //if (!CanChangeFileLocation)
-                //{
-                //    return;
-                //}
+            //    if (value == m_currentMedia)
+            //    {
+            //        return;
+            //    }
+            //    if (!CanChangeFileLocation)
+            //    {
+            //        return;
+            //    }
 
-                //m_currentMedia = value;
-                //m_playlist.CurrentMedia = value;
-                //RaiseCommandCanExecuteChanged();
+            //    m_currentMedia = value;
+            //    m_playlist.CurrentMedia = value;
+            //    RaiseCommandCanExecuteChanged();
 
-                //NotifyPropertyChanged(nameof(this.CurrentMedia));
+            //    NotifyPropertyChanged(nameof(this.CurrentMedia));
             //}
         }
 
@@ -131,6 +132,7 @@ namespace MixAudio
         public PlayerViewModel()
         {
             m_playlist = new Playlist();
+            m_playlist.StateChanged += M_playlist_StateChanged;
             m_playlist.PlaybackStopped += M_player_PlaybackStopped;
             InitializeCommands();
             InitializeTimer();
@@ -330,6 +332,11 @@ namespace MixAudio
                 }
             }
             RaisePropertyChanged(nameof(SeekValue));
+        }
+
+        private void M_playlist_StateChanged()
+        {
+            RaiseCommandCanExecuteChanged();
         }
 
         private void M_player_PlaybackStopped()

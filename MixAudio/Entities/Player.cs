@@ -163,9 +163,25 @@ namespace MixAudio
 
                 m_state = value;
                 NotifyPropertyChanged(nameof(this.State));
+
+                if (StateChanged != null)
+                {
+                    if (m_syncContext != null)
+                    {
+                        m_syncContext.Post(new SendOrPostCallback((o) =>
+                        {
+                            StateChanged();
+                        }), null);
+                    }
+                    else
+                    {
+                        StateChanged();
+                    }
+                }
             }
         }
-        
+        public event Action StateChanged;
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         public event Action PlaybackStopped;

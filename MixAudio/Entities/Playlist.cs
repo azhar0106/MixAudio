@@ -17,12 +17,12 @@ namespace MixAudio
         public Playlist()
         {
             m_player = new Player();
+            m_player.StateChanged += M_player_StateChanged;
             m_player.PlaybackStopped += M_player_PlaybackStopped;
 
             m_mediaList = new List<string>();
             m_currentMedia = -1;
         }
-
 
         public PlaybackState State {
             get
@@ -30,6 +30,7 @@ namespace MixAudio
                 return m_player.State;
             }
         }
+        public event Action StateChanged;
 
         public void Play()
         {
@@ -45,6 +46,10 @@ namespace MixAudio
         public void Stop()
         {
             m_isStopInitiatedByUser = true;
+            InternalStop();
+        }
+        private void InternalStop()
+        {
             m_player.Stop();
         }
 
@@ -90,7 +95,7 @@ namespace MixAudio
             }
             set
             {
-                Stop();
+                InternalStop();
                 m_currentMedia = value;
                 Play();
             }
@@ -100,13 +105,13 @@ namespace MixAudio
         {
             if (State == PlaybackState.Playing)
             {
-                Stop();
+                InternalStop();
                 MoveToNextMedia();
                 Play();
             }
             else
             {
-                Stop();
+                InternalStop();
                 MoveToNextMedia();
             }
         }
@@ -115,13 +120,13 @@ namespace MixAudio
         {
             if (State == PlaybackState.Playing)
             {
-                Stop();
+                InternalStop();
                 MoveToPreviousMedia();
                 Play();
             }
             else
             {
-                Stop();
+                InternalStop();
                 MoveToPreviousMedia();
             }
         }
@@ -159,6 +164,11 @@ namespace MixAudio
             return m_mediaList[index];
         }
 
+
+        private void M_player_StateChanged()
+        {
+            StateChanged?.Invoke();
+        }
 
         private void M_player_PlaybackStopped()
         {
