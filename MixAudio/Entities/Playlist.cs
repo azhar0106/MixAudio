@@ -4,13 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MixAudio.Entities
+namespace MixAudio
 {
     public class Playlist : IPlaylist
     {
         Player m_player;
         List<string> m_mediaList;
         int m_currentMedia;
+        bool m_isStopInitiatedByUser;
 
 
         public Playlist()
@@ -19,6 +20,7 @@ namespace MixAudio.Entities
             m_player.PlaybackStopped += M_player_PlaybackStopped;
 
             m_mediaList = new List<string>();
+            m_currentMedia = -1;
         }
 
 
@@ -31,7 +33,7 @@ namespace MixAudio.Entities
 
         public void Play()
         {
-            m_player.MediaSource = m_mediaList[CurrentMedia];
+            m_player.CurrentMedia = CurrentMedia;
             m_player.Play();
         }
 
@@ -42,12 +44,45 @@ namespace MixAudio.Entities
 
         public void Stop()
         {
+            m_isStopInitiatedByUser = true;
             m_player.Stop();
         }
 
         public event Action PlaybackStopped;
 
-        public int CurrentMedia
+        public double Position
+        {
+            get
+            {
+                return m_player.Position;
+            }
+            set
+            {
+                m_player.Position = value;
+            }
+        }
+        
+        public double Length
+        {
+            get
+            {
+                return m_player.Length;
+            }
+        }
+        
+        public string CurrentMedia
+        {
+            get
+            {
+                return m_mediaList[CurrentMediaIndex];
+            }
+            set
+            {
+                throw new NotSupportedException();
+            }
+        }
+        
+        public int CurrentMediaIndex
         {
             get
             {
@@ -63,25 +98,31 @@ namespace MixAudio.Entities
 
         public void Next()
         {
-            if (m_currentMedia == m_mediaList.Count - 1)
+            if (State == PlaybackState.Playing)
             {
-                m_currentMedia = 0;
+                Stop();
+                MoveToNextMedia();
+                Play();
             }
             else
             {
-                m_currentMedia++;
+                Stop();
+                MoveToNextMedia();
             }
         }
 
         public void Previous()
         {
-            if (m_currentMedia == 0)
+            if (State == PlaybackState.Playing)
             {
-                m_currentMedia = m_mediaList.Count - 1;
+                Stop();
+                MoveToPreviousMedia();
+                Play();
             }
             else
             {
-                m_currentMedia--;
+                Stop();
+                MoveToPreviousMedia();
             }
         }
 
@@ -96,11 +137,21 @@ namespace MixAudio.Entities
         public void AddMedia(int index, string mediaLocation)
         {
             m_mediaList.Insert(index, mediaLocation);
+
+            if (m_mediaList.Count == 1)
+            {
+                m_currentMedia = 0;
+            }
         }
 
         public void RemoveMedia(int index)
         {
             m_mediaList.RemoveAt(index);
+
+            if (m_mediaList.Count == 0)
+            {
+                m_currentMedia = -1;
+            }
         }
 
         public string GetMedia(int index)
@@ -112,6 +163,38 @@ namespace MixAudio.Entities
         private void M_player_PlaybackStopped()
         {
             PlaybackStopped?.Invoke();
+            if (m_isStopInitiatedByUser)
+            {
+                m_isStopInitiatedByUser = false;
+                return;
+            }
+            Next();
+            Play();
+        }
+
+
+        private void MoveToNextMedia()
+        {
+            if (m_currentMedia == m_mediaList.Count - 1)
+            {
+                m_currentMedia = 0;
+            }
+            else
+            {
+                m_currentMedia++;
+            }
+        }
+
+        private void MoveToPreviousMedia()
+        {
+            if (m_currentMedia == 0)
+            {
+                m_currentMedia = m_mediaList.Count - 1;
+            }
+            else
+            {
+                m_currentMedia--;
+            }
         }
     }
 }

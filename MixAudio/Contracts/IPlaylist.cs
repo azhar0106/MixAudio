@@ -6,14 +6,9 @@ using System.Threading.Tasks;
 
 namespace MixAudio
 {
-    public interface IPlaylist
+    public interface IPlaylist : IPlayer
     {
-        PlaybackState State { get; }
-        void Play();
-        void Pause();
-        void Stop();
-        event Action PlaybackStopped;
-        int CurrentMedia { get; set; }
+        int CurrentMediaIndex { get; set; }
         void Next();
         void Previous();
         void AddMedia(int index, string mediaLocation);

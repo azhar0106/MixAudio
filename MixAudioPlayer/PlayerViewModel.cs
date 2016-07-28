@@ -11,50 +11,49 @@ namespace MixAudio
 {
     public class PlayerViewModel : INotifyPropertyChanged
     {
-        IPlayer m_player;
+        IPlaylist m_playlist;
         DispatcherTimer m_timer;
         bool m_seekStarted;
 
-
-        private string m_fileLocation;
-        public string FileLocation
+        
+        public string CurrentMedia
         {
-            get { return m_fileLocation; }
-            set
-            {
-                if (value == m_fileLocation)
-                {
-                    return;
-                }
-                if (!CanChangeFileLocation)
-                {
-                    return;
-                }
+            get { return m_playlist.CurrentMedia; }
+            //set
+            //{
+                //if (value == m_currentMedia)
+                //{
+                //    return;
+                //}
+                //if (!CanChangeFileLocation)
+                //{
+                //    return;
+                //}
 
-                m_fileLocation = value;
-                m_player.MediaSource = value;
-                RaiseCommandCanExecuteChanged();
+                //m_currentMedia = value;
+                //m_playlist.CurrentMedia = value;
+                //RaiseCommandCanExecuteChanged();
 
-                NotifyPropertyChanged(nameof(this.FileLocation));
-            }
+                //NotifyPropertyChanged(nameof(this.CurrentMedia));
+            //}
         }
 
-        private bool m_canChangeFileLocation;
-        public bool CanChangeFileLocation
-        {
-            get { return m_canChangeFileLocation; }
-            set
-            {
-                if (value == m_canChangeFileLocation)
-                {
-                    return;
-                }
+        //private bool m_canChangeFileLocation;
+        //public bool CanChangeFileLocation
+        //{
+        //    get { return m_canChangeFileLocation; }
+        //    set
+        //    {
+        //        if (value == m_canChangeFileLocation)
+        //        {
+        //            return;
+        //        }
 
-                m_canChangeFileLocation = value;
+        //        m_canChangeFileLocation = value;
 
-                NotifyPropertyChanged(nameof(this.CanChangeFileLocation));
-            }
-        }
+        //        NotifyPropertyChanged(nameof(this.CanChangeFileLocation));
+        //    }
+        //}
         
         private int m_seekMin;
         public int SeekMin
@@ -63,7 +62,7 @@ namespace MixAudio
             set
             {
                 m_seekMin = value;
-                NotifyPropertyChanged(nameof(this.SeekMin));
+                RaisePropertyChanged(nameof(this.SeekMin));
             }
         }
 
@@ -74,7 +73,7 @@ namespace MixAudio
             set
             {
                 m_seekMax = value;
-                NotifyPropertyChanged(nameof(this.SeekMax));
+                RaisePropertyChanged(nameof(this.SeekMax));
             }
         }
 
@@ -85,7 +84,7 @@ namespace MixAudio
             set
             {
                 m_seekValue = value;
-                NotifyPropertyChanged(nameof(this.SeekValue));
+                RaisePropertyChanged(nameof(this.SeekValue));
             }
         }
 
@@ -96,7 +95,7 @@ namespace MixAudio
             set
             {
                 m_message = value;
-                NotifyPropertyChanged(nameof(this.Message));
+                RaisePropertyChanged(nameof(this.Message));
             }
         }
 
@@ -104,54 +103,67 @@ namespace MixAudio
         public event PropertyChangedEventHandler PropertyChanged;
 
 
-        public double InputFilterPosition
-        {
-            get { return ((Player)m_player).InputFilterPosition; }
-        }
+        //public double InputFilterPosition
+        //{
+        //    get { return ((Player)m_playlist).InputFilterPosition; }
+        //}
 
-        public double OutputFilterPosition
-        {
-            get { return ((Player)m_player).OutputFilterPosition; }
-        }
+        //public double OutputFilterPosition
+        //{
+        //    get { return ((Player)m_playlist).OutputFilterPosition; }
+        //}
 
-        public double PlayPosition
-        {
-            get { return m_player.Position; }
-        }
+        //public double PlayPosition
+        //{
+        //    get { return m_playlist.Position; }
+        //}
 
 
         public DelegateCommand PlayCommand { get; set; }
         public DelegateCommand PauseCommand { get; set; }
         public DelegateCommand StopCommand { get; set; }
+        public DelegateCommand NextCommand { get; set; }
+        public DelegateCommand PreviousCommand { get; set; }
         public DelegateCommand SeekStartedCommand { get; set; }
         public DelegateCommand SeekStoppedCommand { get; set; }
 
 
         public PlayerViewModel()
         {
-            m_player = new Player();
-            m_player.PlaybackStopped += M_player_PlaybackStopped;
+            m_playlist = new Playlist();
+            m_playlist.PlaybackStopped += M_player_PlaybackStopped;
             InitializeCommands();
             InitializeTimer();
-            CanChangeFileLocation = true;
-            FileLocation = @"C:\Users\Azhar\Desktop\Songs\Trance\A Sky Full Of Stars (Extended Mix).mp3";
+            //CanChangeFileLocation = true;
+            //CurrentMedia = @"C:\Users\Azhar\Desktop\Songs\Trance\A Sky Full Of Stars (Extended Mix).mp3";
             SeekMin = 0;
             SeekMax = 1;
             SeekValue = 0;
+
+            //m_playlist.AddMedia(0, @"C:\Users\Azhar\Desktop\Songs\Trance\A Sky Full Of Stars (Extended Mix).mp3");
+            //m_playlist.AddMedia(1, @"C:\Users\Azhar\Desktop\Songs\Trance\A Sky Full Of Stars (Extended Mix).mp3");
+            m_playlist.AddMedia(0, @"C:\Users\Azhar\Desktop\Songs\Katti Batti\Katti Batti - 01 - Sarfira.mp3");
+            m_playlist.AddMedia(1, @"C:\Users\Azhar\Desktop\Songs\Katti Batti\Katti Batti - 02 - Sau Aasoon.mp3");
+            m_playlist.AddMedia(2, @"C:\Users\Azhar\Desktop\Songs\Katti Batti\Katti Batti - 04 - Ove Janiya.mp3");
+            RaiseCommandCanExecuteChanged();
         }
 
 
         private void InitializeCommands()
         {
-            PlayCommand = new DelegateCommand(new Action<object>(Play), new Predicate<object>(CanPlay));
+            PlayCommand = new DelegateCommand(new Action(Play), new Func<bool>(CanPlay));
 
-            PauseCommand = new DelegateCommand(new Action<object>(Pause), new Predicate<object>(CanPause));
+            PauseCommand = new DelegateCommand(new Action(Pause), new Func<bool>(CanPause));
 
-            StopCommand = new DelegateCommand(new Action<object>(Stop), new Predicate<object>(CanStop));
+            StopCommand = new DelegateCommand(new Action(Stop), new Func<bool>(CanStop));
 
-            SeekStartedCommand = new DelegateCommand(new Action<object>(SeekStarted));
+            NextCommand = new DelegateCommand(new Action(Next), new Func<bool>(CanMoveToNext));
 
-            SeekStoppedCommand = new DelegateCommand(new Action<object>(SeekStopped));
+            PreviousCommand = new DelegateCommand(new Action(Previous), new Func<bool>(CanMoveToPrevious));
+
+            SeekStartedCommand = new DelegateCommand(new Action(SeekStarted));
+
+            SeekStoppedCommand = new DelegateCommand(new Action(SeekStopped));
         }
 
         private void RaiseCommandCanExecuteChanged()
@@ -159,6 +171,9 @@ namespace MixAudio
             PlayCommand.RaiseCanExecuteChanged();
             PauseCommand.RaiseCanExecuteChanged();
             StopCommand.RaiseCanExecuteChanged();
+            NextCommand.RaiseCanExecuteChanged();
+            PreviousCommand.RaiseCanExecuteChanged();
+            RaisePropertyChanged(nameof(CurrentMedia));
         }
 
         private void InitializeTimer()
@@ -169,25 +184,25 @@ namespace MixAudio
             m_timer.Start();
         }
 
-        private void Play(object parameter)
+        private void Play()
         {
             Call(() =>
             {
-                m_player.Play();
+                m_playlist.Play();
                 RaiseCommandCanExecuteChanged();
                 SeekMin = 0;
-                CanChangeFileLocation = false;
+                //CanChangeFileLocation = false;
             });
         }
-        private bool CanPlay(object parameter)
+        private bool CanPlay()
         {
-            if (m_player.State == PlaybackState.Stopped &&
-                string.IsNullOrWhiteSpace(FileLocation))
+            if (m_playlist.State == PlaybackState.Stopped &&
+                string.IsNullOrWhiteSpace(CurrentMedia))
             {
                 return false;
             }
-            if (m_player.State == PlaybackState.Stopped ||
-                m_player.State == PlaybackState.Paused)
+            if (m_playlist.State == PlaybackState.Stopped ||
+                m_playlist.State == PlaybackState.Paused)
             {
                 return true;
             }
@@ -195,17 +210,17 @@ namespace MixAudio
             return false;
         }
 
-        private void Pause(object parameter)
+        private void Pause()
         {
             Call(() =>
             {
-                m_player.Pause();
+                m_playlist.Pause();
                 RaiseCommandCanExecuteChanged();
             });
         }
-        private bool CanPause(object parameter)
+        private bool CanPause()
         {
-            if (m_player.State == PlaybackState.Playing)
+            if (m_playlist.State == PlaybackState.Playing)
             {
                 return true;
             }
@@ -213,20 +228,20 @@ namespace MixAudio
             return false;
         }
 
-        private void Stop(object parameter)
+        private void Stop()
         {
             Call(() =>
             {
-                m_player.Stop();
+                m_playlist.Stop();
                 RaiseCommandCanExecuteChanged();
                 SeekMin = 0;
                 SeekMax = 1;
                 SeekValue = 0;
             });
         }
-        private bool CanStop(object parameter)
+        private bool CanStop()
         {
-            if (m_player.State == PlaybackState.Playing || m_player.State == PlaybackState.Paused)
+            if (m_playlist.State == PlaybackState.Playing || m_playlist.State == PlaybackState.Paused)
             {
                 return true;
             }
@@ -234,20 +249,50 @@ namespace MixAudio
             return false;
         }
 
-        private void SeekStarted(object parameter)
+        private void Next()
+        {
+            m_playlist.Next();
+            RaiseCommandCanExecuteChanged();
+        }
+        private bool CanMoveToNext()
+        {
+            if (m_playlist.MediaCount > 1)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        private void Previous()
+        {
+            m_playlist.Previous();
+            RaiseCommandCanExecuteChanged();
+        }
+        private bool CanMoveToPrevious()
+        {
+            if (m_playlist.MediaCount > 1)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        private void SeekStarted()
         {
             m_seekStarted = true;
         }
 
-        private void SeekStopped(object parameter)
+        private void SeekStopped()
         {
-            if (m_player.State == PlaybackState.Stopped)
+            if (m_playlist.State == PlaybackState.Stopped)
             {
                 m_seekStarted = false;
                 return;
             }
 
-            m_player.SeekTo(SeekValue);
+            m_playlist.Position = SeekValue;
             m_seekStarted = false;
         }
 
@@ -266,11 +311,11 @@ namespace MixAudio
 
         private void M_timer_Tick(object sender, EventArgs e)
         {
-            NotifyPropertyChanged(nameof(InputFilterPosition));
-            NotifyPropertyChanged(nameof(OutputFilterPosition));
-            NotifyPropertyChanged(nameof(PlayPosition));
+            //NotifyPropertyChanged(nameof(InputFilterPosition));
+            //NotifyPropertyChanged(nameof(OutputFilterPosition));
+            //NotifyPropertyChanged(nameof(PlayPosition));
 
-            if (m_player.Length == 0)
+            if (m_playlist.Length == 0)
             {
                 SeekMin = 0;
                 SeekMax = 1;
@@ -280,11 +325,11 @@ namespace MixAudio
             {
                 if (!m_seekStarted)
                 {
-                    SeekMax = (int)m_player.Length;
-                    m_seekValue = (int)m_player.Position;
+                    SeekMax = (int)m_playlist.Length;
+                    m_seekValue = (int)m_playlist.Position;
                 }
             }
-            NotifyPropertyChanged(nameof(SeekValue));
+            RaisePropertyChanged(nameof(SeekValue));
         }
 
         private void M_player_PlaybackStopped()
@@ -292,12 +337,12 @@ namespace MixAudio
             SeekMin = 0;
             SeekMax = 1;
             SeekValue = 0;
-            CanChangeFileLocation = true;
+            //CanChangeFileLocation = true;
             RaiseCommandCanExecuteChanged();
         }
 
 
-        private void NotifyPropertyChanged(string propertyName)
+        private void RaisePropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }

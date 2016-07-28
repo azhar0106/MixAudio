@@ -12,11 +12,9 @@ namespace MixAudio
         void Play();
         void Pause();
         void Stop();
-        void SeekTo(double position);
-        double Position { get; }
-        double Length { get; }
-        string MediaSource { get; set; }
-
         event Action PlaybackStopped;
+        double Position { get; set; }
+        double Length { get; }
+        string CurrentMedia { get; set; }
     }
 }

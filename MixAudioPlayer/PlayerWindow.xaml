@@ -23,13 +23,13 @@
         <Border Height="10"/>
         <DockPanel LastChildFill="True">
             <Label DockPanel.Dock="Left" Content="Media Source:"/>
-            <Button x:Name="MediaSourceBrowseButton"
+            <!--<Button x:Name="MediaSourceBrowseButton"
                     DockPanel.Dock="Right"
                     Style="{StaticResource ButtonStyle}"
                     IsEnabled="{Binding CanChangeFileLocation}"
-                    Content="Browse..." Click="MediaSourceBrowseButton_Click"/>
-            <TextBox x:Name="MediaSourceTextBox" Text="{Binding FileLocation}"
-                     AcceptsReturn="False" IsReadOnly="True" MinWidth="500"
+                    Content="Browse..." Click="MediaSourceBrowseButton_Click"/>-->
+            <TextBox x:Name="MediaSourceTextBox" Text="{Binding CurrentMedia, Mode=OneWay}"
+                     AcceptsReturn="False" IsReadOnly="True" MinWidth="500" Margin="5"
                      VerticalAlignment="Center" HorizontalAlignment="Stretch"/>
         </DockPanel>
         <StackPanel Orientation="Horizontal">
@@ -39,6 +39,10 @@
                     Style="{StaticResource ButtonStyle}" Content="Pause"/>
             <Button x:Name="Stop" Command="{Binding StopCommand}"
                     Style="{StaticResource ButtonStyle}" Content="Stop"/>
+            <Button x:Name="Prev" Command="{Binding PreviousCommand}"
+                    Style="{StaticResource ButtonStyle}" Content="&lt;&lt;"/>
+            <Button x:Name="Next" Command="{Binding NextCommand}"
+                    Style="{StaticResource ButtonStyle}" Content=">>"/>
         </StackPanel>
         <StackPanel>
             <Slider x:Name="SeekSlider" Margin="0,5"
@@ -61,7 +65,7 @@
             <TextBox x:Name="MessageTextBox" Text="{Binding Message}" IsReadOnly="True"
                      VerticalAlignment="Center" HorizontalAlignment="Stretch" Margin="5"/>
         </DockPanel>
-        <DockPanel LastChildFill="True">
+        <!--<DockPanel LastChildFill="True">
             <Label DockPanel.Dock="Left" Width="150">Input Filter Position:</Label>
             <TextBox IsReadOnly="True" Text="{Binding InputFilterPosition, Mode=OneWay}"
                      VerticalAlignment="Center"/>
@@ -75,6 +79,6 @@
             <Label DockPanel.Dock="Left" Width="150">Play Position:</Label>
             <TextBox IsReadOnly="True" Text="{Binding PlayPosition, Mode=OneWay}"
                      VerticalAlignment="Center"/>
-        </DockPanel>
+        </DockPanel>-->
     </StackPanel>
 </Window>

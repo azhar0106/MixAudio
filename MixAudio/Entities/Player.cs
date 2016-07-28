@@ -22,12 +22,12 @@ namespace MixAudio
         double m_positionAtLastPause;
         
 
-        private string m_mediaSource;
-        public string MediaSource
+        private string m_currentMedia;
+        public string CurrentMedia
         {
             get
             {
-                return m_mediaSource;
+                return m_currentMedia;
             }
 
             set
@@ -37,14 +37,14 @@ namespace MixAudio
                     throw new InvalidOperationException("Source can be set when Player is in stopped state.");
                 }
 
-                if (m_mediaSource == value)
+                if (m_currentMedia == value)
                 {
                     return;    
                 }
 
-                m_mediaSource = value;
+                m_currentMedia = value;
 
-                NotifyPropertyChanged(nameof(this.MediaSource));
+                NotifyPropertyChanged(nameof(this.CurrentMedia));
             }
         }
 
@@ -72,6 +72,10 @@ namespace MixAudio
                 {
                     return 0.0;
                 }
+            }
+            set
+            {
+                SeekTo(value);
             }
         }
 
@@ -180,7 +184,7 @@ namespace MixAudio
         {
             Debug.WriteLine("PL:M: Play");
 
-            if (String.IsNullOrWhiteSpace(MediaSource))
+            if (String.IsNullOrWhiteSpace(CurrentMedia))
             {
                 throw new InvalidOperationException("Media Source is not specified.");
             }
@@ -206,7 +210,7 @@ namespace MixAudio
                     m_pipeline = new Pipeline();
 
                     m_inputFilter = new FileSourceFilter();
-                    m_inputFilter.MediaSource = this.MediaSource;
+                    m_inputFilter.MediaSource = this.CurrentMedia;
                     
                     m_outputFilter = new WaveSinkFilter();
                     m_outputFilter.PlaybackStopped += M_outputFilter_Stopped;
@@ -279,7 +283,7 @@ namespace MixAudio
             }));
         }
 
-        public void SeekTo(double position)
+        private void SeekTo(double position)
         {
             Debug.WriteLine("PL:M: SeekTo");
 
