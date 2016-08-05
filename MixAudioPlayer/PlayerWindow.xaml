@@ -62,6 +62,9 @@
             <Border DockPanel.Dock="Top"
                     Margin="5"
                     BorderBrush="LightGray" BorderThickness="1"/>
+            <Border DockPanel.Dock="Bottom"
+                    Margin="5"
+                    BorderBrush="LightGray" BorderThickness="1"/>
             <TextBox x:Name="MessageTextBox" Text="{Binding Message}" IsReadOnly="True"
                      VerticalAlignment="Center" HorizontalAlignment="Stretch" Margin="5"/>
         </DockPanel>
@@ -80,5 +83,8 @@
             <TextBox IsReadOnly="True" Text="{Binding PlayPosition, Mode=OneWay}"
                      VerticalAlignment="Center"/>
         </DockPanel>-->
+        <ListBox ItemsSource="{Binding MediaList}">
+            
+        </ListBox>
     </StackPanel>
 </Window>

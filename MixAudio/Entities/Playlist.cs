@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,8 +10,8 @@ namespace MixAudio
     public class Playlist : IPlaylist
     {
         Player m_player;
-        List<string> m_mediaList;
-        int m_currentMedia;
+        ObservableCollection<string> m_mediaList;
+        int m_currentMediaIndex;
         bool m_isStopInitiatedByUser;
 
 
@@ -20,9 +21,11 @@ namespace MixAudio
             m_player.StateChanged += M_player_StateChanged;
             m_player.PlaybackStopped += M_player_PlaybackStopped;
 
-            m_mediaList = new List<string>();
-            m_currentMedia = -1;
+            m_mediaList = new ObservableCollection<string>();
+            m_mediaList.CollectionChanged += M_mediaList_CollectionChanged;
+            m_currentMediaIndex = -1;
         }
+
 
         public PlaybackState State {
             get
@@ -91,12 +94,12 @@ namespace MixAudio
         {
             get
             {
-                return m_currentMedia;
+                return m_currentMediaIndex;
             }
             set
             {
                 InternalStop();
-                m_currentMedia = value;
+                m_currentMediaIndex = value;
                 Play();
             }
         }
@@ -130,40 +133,30 @@ namespace MixAudio
                 MoveToPreviousMedia();
             }
         }
-
-        public int MediaCount
+        
+        public ObservableCollection<string> MediaList
         {
             get
             {
-                return m_mediaList.Count;
+                return m_mediaList;
             }
         }
 
-        public void AddMedia(int index, string mediaLocation)
-        {
-            m_mediaList.Insert(index, mediaLocation);
 
-            if (m_mediaList.Count == 1)
+        private void M_mediaList_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            if (MediaList.Count == 0)
             {
-                m_currentMedia = 0;
+                m_currentMediaIndex = -1;
             }
-        }
-
-        public void RemoveMedia(int index)
-        {
-            m_mediaList.RemoveAt(index);
-
-            if (m_mediaList.Count == 0)
+            else
             {
-                m_currentMedia = -1;
+                if (m_currentMediaIndex == -1)
+                {
+                    m_currentMediaIndex = 0;
+                }
             }
         }
-
-        public string GetMedia(int index)
-        {
-            return m_mediaList[index];
-        }
-
 
         private void M_player_StateChanged()
         {
@@ -185,25 +178,25 @@ namespace MixAudio
 
         private void MoveToNextMedia()
         {
-            if (m_currentMedia == m_mediaList.Count - 1)
+            if (m_currentMediaIndex == m_mediaList.Count - 1)
             {
-                m_currentMedia = 0;
+                m_currentMediaIndex = 0;
             }
             else
             {
-                m_currentMedia++;
+                m_currentMediaIndex++;
             }
         }
 
         private void MoveToPreviousMedia()
         {
-            if (m_currentMedia == 0)
+            if (m_currentMediaIndex == 0)
             {
-                m_currentMedia = m_mediaList.Count - 1;
+                m_currentMediaIndex = m_mediaList.Count - 1;
             }
             else
             {
-                m_currentMedia--;
+                m_currentMediaIndex--;
             }
         }
     }

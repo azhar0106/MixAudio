@@ -64,12 +64,14 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="DelegateCommand.cs" />
+    <Compile Include="ViewModelBase.cs" />
     <Page Include="PlayerWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="MediaViewModel.cs" />
     <Compile Include="PlayerViewModel.cs" />
     <Compile Include="PlayerWindow.xaml.cs">
       <DependentUpon>PlayerWindow.xaml</DependentUpon>

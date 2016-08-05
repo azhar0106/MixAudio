@@ -1,5 +1,7 @@
-﻿using System;
+﻿using MixAudioPlayer;
+using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
@@ -9,7 +11,7 @@ using System.Windows.Threading;
 
 namespace MixAudio
 {
-    public class PlayerViewModel : INotifyPropertyChanged
+    public class PlayerViewModel : ViewModelBase
     {
         IPlaylist m_playlist;
         DispatcherTimer m_timer;
@@ -38,23 +40,6 @@ namespace MixAudio
             //    NotifyPropertyChanged(nameof(this.CurrentMedia));
             //}
         }
-
-        //private bool m_canChangeFileLocation;
-        //public bool CanChangeFileLocation
-        //{
-        //    get { return m_canChangeFileLocation; }
-        //    set
-        //    {
-        //        if (value == m_canChangeFileLocation)
-        //        {
-        //            return;
-        //        }
-
-        //        m_canChangeFileLocation = value;
-
-        //        NotifyPropertyChanged(nameof(this.CanChangeFileLocation));
-        //    }
-        //}
         
         private int m_seekMin;
         public int SeekMin
@@ -100,6 +85,8 @@ namespace MixAudio
             }
         }
 
+        public ObservableCollection<string> MediaList { get; set; }
+
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -134,19 +121,19 @@ namespace MixAudio
             m_playlist = new Playlist();
             m_playlist.StateChanged += M_playlist_StateChanged;
             m_playlist.PlaybackStopped += M_player_PlaybackStopped;
+            MediaList = m_playlist.MediaList;
+
             InitializeCommands();
             InitializeTimer();
-            //CanChangeFileLocation = true;
-            //CurrentMedia = @"C:\Users\Azhar\Desktop\Songs\Trance\A Sky Full Of Stars (Extended Mix).mp3";
             SeekMin = 0;
             SeekMax = 1;
             SeekValue = 0;
 
             //m_playlist.AddMedia(0, @"C:\Users\Azhar\Desktop\Songs\Trance\A Sky Full Of Stars (Extended Mix).mp3");
             //m_playlist.AddMedia(1, @"C:\Users\Azhar\Desktop\Songs\Trance\A Sky Full Of Stars (Extended Mix).mp3");
-            m_playlist.AddMedia(0, @"C:\Users\Azhar\Desktop\Songs\Katti Batti\Katti Batti - 01 - Sarfira.mp3");
-            m_playlist.AddMedia(1, @"C:\Users\Azhar\Desktop\Songs\Katti Batti\Katti Batti - 02 - Sau Aasoon.mp3");
-            m_playlist.AddMedia(2, @"C:\Users\Azhar\Desktop\Songs\Katti Batti\Katti Batti - 04 - Ove Janiya.mp3");
+            m_playlist.MediaList.Add(@"C:\Users\Azhar\Desktop\Songs\Katti Batti\Katti Batti - 01 - Sarfira.mp3");
+            m_playlist.MediaList.Add(@"C:\Users\Azhar\Desktop\Songs\Katti Batti\Katti Batti - 02 - Sau Aasoon.mp3");
+            m_playlist.MediaList.Add(@"C:\Users\Azhar\Desktop\Songs\Katti Batti\Katti Batti - 04 - Ove Janiya.mp3");
             RaiseCommandCanExecuteChanged();
         }
 
@@ -185,6 +172,7 @@ namespace MixAudio
             m_timer.Tick += M_timer_Tick;
             m_timer.Start();
         }
+        
 
         private void Play()
         {
@@ -258,7 +246,7 @@ namespace MixAudio
         }
         private bool CanMoveToNext()
         {
-            if (m_playlist.MediaCount > 1)
+            if (m_playlist.MediaList.Count > 1)
             {
                 return true;
             }
@@ -273,7 +261,7 @@ namespace MixAudio
         }
         private bool CanMoveToPrevious()
         {
-            if (m_playlist.MediaCount > 1)
+            if (m_playlist.MediaList.Count > 1)
             {
                 return true;
             }
@@ -349,9 +337,5 @@ namespace MixAudio
         }
 
 
-        private void RaisePropertyChanged(string propertyName)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
     }
 }
